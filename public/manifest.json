@@ -1,0 +1,22 @@
+{
+  "manifest_version": 3,
+  "name": "ReelRoom",
+  "version": "1.0",
+  "description": "A Vue-based Chrome extension with Supabase auth.",
+  "action": {
+    "default_popup": "index.html"
+  },
+  "background": {
+    "service_worker": "background.js",
+    "type": "module"
+  },
+  "permissions": ["identity", "storage"],
+  "host_permissions": ["https://*.supabase.co/*"],
+  "oauth2": {
+    "client_id": "client_id",
+    "scopes": ["openid", "email", "profile"]
+  },
+  "content_security_policy": {
+    "extension_pages": "script-src 'self' 'wasm-unsafe-eval'; object-src 'self';"
+  }
+}
