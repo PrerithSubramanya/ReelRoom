@@ -1,32 +1,55 @@
 <template>
-  <div class="flex flex-col items-center justify-center h-full p-6">
-    <h1 class="text-3xl font-bold text-gray-800 mb-2">ReelRoom</h1>
-    <p class="text-gray-500 mb-8">Your personal movie party extension.</p>
-    <button
-      @click="handleLogin"
-      class="w-full flex items-center justify-center bg-gray-800 hover:bg-gray-700 text-white font-bold py-3 px-4 rounded-lg transition-colors duration-200"
-    >
-      <svg class="w-5 h-5 mr-3" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
-        <path
-          fill="#fbc02d"
-          d="M43.611,20.083H42V20H24v8h11.303c-1.649,4.657-6.08,8-11.303,8c-6.627,0-12-5.373-12-12	s5.373-12,12-12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C12.955,4,4,12.955,4,24s8.955,20,20,20	s20-8.955,20-20C44,22.659,43.862,21.35,43.611,20.083z"
-        ></path>
-        <path
-          fill="#e53935"
-          d="M6.306,14.691l6.571,4.819C14.655,15.108,18.961,12,24,12c3.059,0,5.842,1.154,7.961,3.039	l5.657-5.657C34.046,6.053,29.268,4,24,4C16.318,4,9.656,8.337,6.306,14.691z"
-        ></path>
-        <path
-          fill="#4caf50"
-          d="M24,44c5.166,0,9.86-1.977,13.409-5.192l-6.19-5.238C29.211,35.091,26.715,36,24,36	c-5.222,0-9.619-3.317-11.283-7.946l-6.522,5.025C9.505,39.556,16.227,44,24,44z"
-        ></path>
-        <path
-          fill="#1565c0"
-          d="M43.611,20.083L43.595,20L42,20H24v8h11.303c-0.792,2.237-2.231,4.166-4.087,5.574	l6.19,5.238C39.99,34.556,44,29.86,44,24C44,22.659,43.862,21.35,43.611,20.083z"
-        ></path>
-      </svg>
-      Sign In with Google
-    </button>
-    <p v-if="errorMsg" class="text-red-500 text-sm mt-4">{{ errorMsg }}</p>
+  <div class="flex flex-col h-full bg-[var(--background-color)] text-[var(--text-primary)] p-6 justify-center">
+    <main class="flex-grow flex flex-col justify-center">
+      <div class="w-full max-w-sm mx-auto text-center">
+        <div class="flex flex-col items-center space-y-6">
+          <div class="size-12 logo-icon text-[var(--primary-color)]">
+            <svg fill="currentColor" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+              <g clip-path="url(#clip0_6_535)">
+                <path
+                  clip-rule="evenodd"
+                  d="M47.2426 24L24 47.2426L0.757355 24L24 0.757355L47.2426 24ZM12.2426 21H35.7574L24 9.24264L12.2426 21Z"
+                  fill-rule="evenodd"
+                ></path>
+              </g>
+            </svg>
+          </div>
+          <div class="space-y-2">
+            <h2
+              class="text-3xl font-bold tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-[var(--primary-color)] to-green-300"
+            >
+              Welcome Back
+            </h2>
+            <p class="text-sm text-[var(--text-secondary)]">Sign in to sync your next movie night.</p>
+          </div>
+          <button
+            @click="handleLogin"
+            class="flex w-full items-center justify-center gap-3 rounded-full h-11 bg-[var(--surface-color)] text-[var(--text-primary)] text-sm font-bold tracking-wide transition-colors duration-300 hover:bg-opacity-80"
+          >
+            <div data-icon="GoogleLogo" data-size="20px" data-weight="bold">
+              <svg
+                fill="currentColor"
+                height="20px"
+                viewBox="0 0 256 256"
+                width="20px"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M224,128a96,96,0,1,1-21.95-61.09,8,8,0,1,1-12.33,10.18A80,80,0,1,0,207.6,136H128a8,8,0,0,1,0-16h88A8,8,0,0,1,224,128Z"
+                ></path>
+              </svg>
+            </div>
+            <span class="truncate">Continue with Google</span>
+          </button>
+          <p v-if="errorMsg" class="text-red-500 text-xs text-center">{{ errorMsg }}</p>
+          <p class="text-xs text-[var(--text-secondary)] max-w-xs px-4">
+            By continuing, you agree to our
+            <a class="underline hover:text-[var(--text-primary)]" href="#">Terms of Service</a> and
+            <a class="underline hover:text-[var(--text-primary)]" href="#">Privacy Policy</a>.
+          </p>
+        </div>
+      </div>
+    </main>
   </div>
 </template>
 
@@ -45,6 +68,13 @@ onMounted(() => {
     if (message.type === 'AUTH_ERROR') {
       errorMsg.value = message.error
     }
+    return true
   })
 })
 </script>
+
+<style scoped>
+.logo-icon path {
+  fill: var(--primary-color);
+}
+</style>

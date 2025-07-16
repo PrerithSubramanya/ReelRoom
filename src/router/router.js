@@ -1,13 +1,27 @@
 import { createRouter, createWebHashHistory } from 'vue-router'
-import { supabase as sb } from '../supabase'
-import Login from '../components/Login.vue'
+import { supabase } from '../supabase'
 import Home from '../components/Home.vue'
+import Login from '../components/Login.vue'
 import Onboarding from '../components/Onboarding.vue'
 
 const routes = [
-  { path: '/', name: 'Login', component: Login },
-  { path: '/home', name: 'Home', component: Home, meta: { requiresAuth: true } },
-  { path: '/onboarding', name: 'Onboarding', component: Onboarding, meta: { requiresAuth: true } },
+  {
+    path: '/',
+    name: 'Home',
+    component: Home,
+    meta: { requiresAuth: true },
+  },
+  {
+    path: '/login',
+    name: 'Login',
+    component: Login,
+  },
+  {
+    path: '/onboarding',
+    name: 'Onboarding',
+    component: Onboarding,
+    meta: { requiresAuth: true },
+  },
 ]
 
 const router = createRouter({
@@ -18,23 +32,20 @@ const router = createRouter({
 router.beforeEach(async (to, from, next) => {
   const {
     data: { session },
-  } = await sb.auth.getSession()
+  } = await supabase.auth.getSession()
 
   const requiresAuth = to.matched.some((record) => record.meta.requiresAuth)
 
   if (requiresAuth && !session) {
-    // Needs to be logged in, but isn't. Redirect to login.
     next({ name: 'Login' })
-  } else if (!requiresAuth && session) {
-    // Trying to access login page while already logged in.
-    const userDisplayName = session.user?.user_metadata?.display_name
-    if (userDisplayName) {
-      next({ name: 'Home' })
-    } else {
-      next({ name: 'Onboarding' })
-    }
-  } else {
-    // All other cases, proceed.
+  } else if (session && to.name === 'Login') {
+    next({ name: 'Home' })
+  } else if (session && !session.user?.user_metadata?.onboarding_completed && to.name !== 'Onboarding') {
+    next({ name: 'Onboarding' })
+  } else if (session && session.user?.user_metadata?.onboarding_completed && to.name === 'Onboarding') {
+    next({ name: 'Home' })
+  }
+  else {
     next()
   }
 })

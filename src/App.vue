@@ -1,7 +1,5 @@
 <template>
-  <div class="w-full h-full bg-gray-50">
-    <router-view />
-  </div>
+  <router-view />
 </template>
 
 <script setup>
@@ -11,38 +9,30 @@ import { supabase } from './supabase'
 
 const router = useRouter()
 
+const handleAuthChange = (session) => {
+  if (session) {
+    if (session.user?.user_metadata?.onboarding_completed) {
+      router.push({ name: 'Home' })
+    } else {
+      router.push({ name: 'Onboarding' })
+    }
+  } else {
+    router.push({ name: 'Login' })
+  }
+}
+
 onMounted(() => {
   // Listen for auth state changes from the background script
-  chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+  chrome.runtime.onMessage.addListener((message) => {
     if (message.type === 'AUTH_STATE_CHANGED') {
-      const session = message.session
-      if (session) {
-        // User is logged in. Check if they need onboarding.
-        const userDisplayName = session.user?.user_metadata?.display_name
-        if (userDisplayName) {
-          router.push({ name: 'Home' })
-        } else {
-          router.push({ name: 'Onboarding' })
-        }
-      } else {
-        // User is logged out.
-        router.push({ name: 'Login' })
-      }
+      handleAuthChange(message.session)
     }
+    return true
   })
 
-  // Also check the initial session state when the popup opens
+  // Check the initial session state
   supabase.auth.getSession().then(({ data: { session } }) => {
-    if (session) {
-      const userDisplayName = session.user?.user_metadata?.display_name
-      if (userDisplayName) {
-        router.push({ name: 'Home' })
-      } else {
-        router.push({ name: 'Onboarding' })
-      }
-    } else {
-      router.push({ name: 'Login' })
-    }
+    handleAuthChange(session)
   })
 })
 </script>

@@ -1,7 +1,7 @@
 import { createClient } from '@supabase/supabase-js'
 
-const SUPABASE_URL = 'env.SUPABASE_URL'
-const SUPABASE_ANON_KEY = 'emv.SUPABASE_ANON_KEY'
+const SUPABASE_URL = 'supabase url'
+const SUPABASE_ANON_KEY = 'supabase anon key'
 // A custom storage adapter for Chrome's asynchronous storage API.
 const chromeStorageAdapter = {
   getItem: async (key) => {

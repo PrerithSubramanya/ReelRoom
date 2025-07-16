@@ -1,1 +1,17 @@
-@import 'tailwindcss';
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --primary-color: #53d22c;
+  --secondary-color: #2e4328;
+  --accent-color: #2e4328; /* Using secondary as accent */
+
+  --background-color: #121810;
+  --surface-color: #1a2418;
+
+  --text-primary: #ffffff;
+  --text-secondary: #a2c398;
+  
+  --border-color: #2e4328;
+}
