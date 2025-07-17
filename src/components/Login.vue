@@ -1,52 +1,105 @@
 <template>
-  <div class="flex flex-col h-full bg-[var(--background-color)] text-[var(--text-primary)] p-6 justify-center">
-    <main class="flex-grow flex flex-col justify-center">
-      <div class="w-full max-w-sm mx-auto text-center">
-        <div class="flex flex-col items-center space-y-6">
-          <div class="size-12 logo-icon text-[var(--primary-color)]">
-            <svg fill="currentColor" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
-              <g clip-path="url(#clip0_6_535)">
-                <path
-                  clip-rule="evenodd"
-                  d="M47.2426 24L24 47.2426L0.757355 24L24 0.757355L47.2426 24ZM12.2426 21H35.7574L24 9.24264L12.2426 21Z"
-                  fill-rule="evenodd"
-                ></path>
-              </g>
-            </svg>
+  <div class="flex flex-col h-full bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 text-gray-900 dark:text-gray-100">
+    <!-- Header -->
+    <div class="flex items-center justify-center pt-4 pb-4">
+      <div class="flex items-center gap-2">
+        <div
+          class="w-8 h-8 rounded-lg flex items-center justify-center overflow-hidden"
+        >
+          <img src="/src/components/icons/ext-logo-32.png" alt="ReelRoom Logo" class="w-full h-full object-contain" />
+        </div>
+        <span class="text-lg font-semibold">ReelRoom</span>
+      </div>
+    </div>
+
+    <!-- Main Content -->
+    <main class="flex-1 flex items-center justify-center px-4 py-4">
+      <div class="w-full max-w-sm">
+        <div
+          class="bg-gradient-to-br from-white to-gray-50 dark:from-gray-800 dark:to-gray-900 rounded-xl p-6 shadow-lg border border-gray-200 dark:border-gray-700"
+        >
+          <!-- Welcome text -->
+          <div class="text-center mb-6">
+            <h1 class="text-xl font-semibold mb-2 text-gray-900 dark:text-gray-100">
+              Welcome to ReelRoom
+            </h1>
+            <p class="text-sm text-gray-600 dark:text-gray-300">
+              Sign in to start watching with friends
+            </p>
           </div>
-          <div class="space-y-2">
-            <h2
-              class="text-3xl font-bold tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-[var(--primary-color)] to-green-300"
-            >
-              Welcome Back
-            </h2>
-            <p class="text-sm text-[var(--text-secondary)]">Sign in to sync your next movie night.</p>
-          </div>
+
+          <!-- Sign in button -->
           <button
             @click="handleLogin"
-            class="flex w-full items-center justify-center gap-3 rounded-full h-11 bg-[var(--surface-color)] text-[var(--text-primary)] text-sm font-bold tracking-wide transition-colors duration-300 hover:bg-opacity-80"
+            :disabled="isLoading"
+            class="w-full flex items-center justify-center gap-3 px-4 py-3 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 hover:border-gray-300 dark:hover:border-gray-600 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            <div data-icon="GoogleLogo" data-size="20px" data-weight="bold">
-              <svg
+            <svg v-if="!isLoading" class="w-5 h-5" viewBox="0 0 24 24">
+              <path
+                fill="#4285F4"
+                d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
+              />
+              <path
+                fill="#34A853"
+                d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
+              />
+              <path
+                fill="#FBBC05"
+                d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"
+              />
+              <path
+                fill="#EA4335"
+                d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
+              />
+            </svg>
+            <svg
+              v-else
+              class="w-5 h-5 animate-spin text-primary-500"
+              fill="none"
+              viewBox="0 0 24 24"
+            >
+              <circle
+                class="opacity-25"
+                cx="12"
+                cy="12"
+                r="10"
+                stroke="currentColor"
+                stroke-width="4"
+              ></circle>
+              <path
+                class="opacity-75"
                 fill="currentColor"
-                height="20px"
-                viewBox="0 0 256 256"
-                width="20px"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  d="M224,128a96,96,0,1,1-21.95-61.09,8,8,0,1,1-12.33,10.18A80,80,0,1,0,207.6,136H128a8,8,0,0,1,0-16h88A8,8,0,0,1,224,128Z"
-                ></path>
-              </svg>
-            </div>
-            <span class="truncate">Continue with Google</span>
+                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+              ></path>
+            </svg>
+            <span class="text-sm font-medium text-gray-900 dark:text-gray-100">
+              {{ isLoading ? 'Signing in...' : 'Continue with Google' }}
+            </span>
           </button>
-          <p v-if="errorMsg" class="text-red-500 text-xs text-center">{{ errorMsg }}</p>
-          <p class="text-xs text-[var(--text-secondary)] max-w-xs px-4">
-            By continuing, you agree to our
-            <a class="underline hover:text-[var(--text-primary)]" href="#">Terms of Service</a> and
-            <a class="underline hover:text-[var(--text-primary)]" href="#">Privacy Policy</a>.
-          </p>
+
+          <!-- Error message -->
+          <div v-if="errorMsg" class="mt-4 p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
+            <div class="flex items-center gap-2">
+              <svg class="w-4 h-4 text-red-500" fill="currentColor" viewBox="0 0 20 20">
+                <path
+                  fill-rule="evenodd"
+                  d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+                  clip-rule="evenodd"
+                />
+              </svg>
+              <p class="text-sm text-red-700 dark:text-red-300">{{ errorMsg }}</p>
+            </div>
+          </div>
+
+          <!-- Footer -->
+          <div class="mt-6 pt-4 border-t border-gray-200 dark:border-gray-700">
+            <p class="text-xs text-gray-500 dark:text-gray-400 text-center leading-relaxed">
+              By continuing, you agree to our
+              <a href="#" class="text-primary-500 hover:underline">Terms</a>
+              and
+              <a href="#" class="text-primary-500 hover:underline">Privacy Policy</a>
+            </p>
+          </div>
         </div>
       </div>
     </main>
@@ -57,24 +110,29 @@
 import { ref, onMounted } from 'vue'
 
 const errorMsg = ref('')
+const isLoading = ref(false)
 
 const handleLogin = () => {
   errorMsg.value = ''
+  isLoading.value = true
+
   chrome.runtime.sendMessage({ source: 'vue-app', type: 'LOGIN' })
+
+  // Reset loading state after a timeout (in case of errors)
+  setTimeout(() => {
+    isLoading.value = false
+  }, 5000)
 }
 
 onMounted(() => {
   chrome.runtime.onMessage.addListener((message) => {
     if (message.type === 'AUTH_ERROR') {
       errorMsg.value = message.error
+      isLoading.value = false
+    } else if (message.type === 'AUTH_STATE_CHANGED') {
+      isLoading.value = false
     }
-    return true
+    // Don't return true since we're not sending a response
   })
 })
 </script>
-
-<style scoped>
-.logo-icon path {
-  fill: var(--primary-color);
-}
-</style>

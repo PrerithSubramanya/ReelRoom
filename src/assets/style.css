@@ -1,17 +1,25 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
 
-:root {
-  --primary-color: #53d22c;
-  --secondary-color: #2e4328;
-  --accent-color: #2e4328; /* Using secondary as accent */
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+}
 
-  --background-color: #121810;
-  --surface-color: #1a2418;
+::-webkit-scrollbar-track {
+  background: light-dark(#f3f4f6, #1f2937);
+}
 
-  --text-primary: #ffffff;
-  --text-secondary: #a2c398;
-  
-  --border-color: #2e4328;
+::-webkit-scrollbar-thumb {
+  background: light-dark(#d1d5db, #4b5563);
+  border-radius: 2px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: light-dark(#9ca3af, #6b7280);
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }

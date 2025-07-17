@@ -26,7 +26,7 @@ async function sendAuthStateToPopups(session) {
 async function sendErrorToPopups(error) {
   try {
     await chrome.runtime.sendMessage({ type: 'ERROR', error: error })
-  } catch (e) {
+  } catch {
     // Ignore if popup is not open
   }
 }
@@ -126,7 +126,7 @@ async function handleLogout() {
 }
 
 // --- Main Message Listener ---
-chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+chrome.runtime.onMessage.addListener((message) => {
   switch (message.type) {
     case 'LOGIN':
       handleLogin()
@@ -140,7 +140,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
       })
       break
   }
-  return true
+  // Don't return true since we're not sending a response
 })
 
 // --- Supabase Auth State Listener ---

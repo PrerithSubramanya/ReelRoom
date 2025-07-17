@@ -27,7 +27,7 @@ onMounted(() => {
     if (message.type === 'AUTH_STATE_CHANGED') {
       handleAuthChange(message.session)
     }
-    return true
+    // Don't return true since we're not sending a response
   })
 
   // Check the initial session state

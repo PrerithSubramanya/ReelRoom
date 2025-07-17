@@ -16,11 +16,19 @@ export default defineConfig([
     languageOptions: {
       globals: {
         ...globals.browser,
+        ...globals.webextensions,
+        chrome: 'readonly',
+        __dirname: 'readonly',
       },
     },
   },
 
   js.configs.recommended,
   ...pluginVue.configs['flat/essential'],
+  {
+    rules: {
+      'vue/multi-word-component-names': 'off',
+    },
+  },
   skipFormatting,
 ])
