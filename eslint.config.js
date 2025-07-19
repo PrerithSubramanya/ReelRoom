@@ -13,11 +13,24 @@ export default defineConfig([
   globalIgnores(['**/dist/**', '**/dist-ssr/**', '**/coverage/**']),
 
   {
+    name: 'app/browser-scripts',
+    files: ['src/**/*.js', 'public/**/*.js', '**/*.vue'],
     languageOptions: {
       globals: {
         ...globals.browser,
         ...globals.webextensions,
         chrome: 'readonly',
+        __dirname: 'readonly',
+      },
+    },
+  },
+
+  {
+    name: 'app/node-scripts',
+    files: ['scripts/**/*.js', 'vite.config.js', 'tailwind.config.js', 'eslint.config.js'],
+    languageOptions: {
+      globals: {
+        ...globals.node,
         __dirname: 'readonly',
       },
     },
