@@ -10,6 +10,8 @@ const __dirname = path.dirname(__filename);
 // Read environment variables
 const OAUTH2_CLIENT_ID = process.env.OAUTH2_CLIENT_ID || '{{OAUTH2_CLIENT_ID}}';
 const SUPABASE_CLIENT_ID = process.env.SUPABASE_CLIENT_ID || '{{SUPABASE_CLIENT_ID}}';
+const SUPABASE_URL = process.env.SUPABASE_URL || '{{SUPABASE_URL}}';
+const SUPABASE_ANON_KEY = process.env.SUPABASE_ANON_KEY || '{{SUPABASE_ANON_KEY}}';
 
 console.log('🔧 Injecting secrets into built extension...');
 
@@ -41,12 +43,12 @@ if (fs.existsSync(distAssetsPath)) {
       let content = fs.readFileSync(filePath, 'utf8');
       
       let updated = false;
-      if (process.env.SUPABASE_URL && content.includes('{{SUPABASE_URL}}')) {
-        content = content.replace(/\{\{SUPABASE_URL\}\}/g, process.env.SUPABASE_URL);
+      if (SUPABASE_URL !== '{{SUPABASE_URL}}' && content.includes('{{SUPABASE_URL}}')) {
+        content = content.replace(/\{\{SUPABASE_URL\}\}/g, SUPABASE_URL);
         updated = true;
       }
-      if (process.env.SUPABASE_ANON_KEY && content.includes('{{SUPABASE_ANON_KEY}}')) {
-        content = content.replace(/\{\{SUPABASE_ANON_KEY\}\}/g, process.env.SUPABASE_ANON_KEY);
+      if (SUPABASE_ANON_KEY !== '{{SUPABASE_ANON_KEY}}' && content.includes('{{SUPABASE_ANON_KEY}}')) {
+        content = content.replace(/\{\{SUPABASE_ANON_KEY\}\}/g, SUPABASE_ANON_KEY);
         updated = true;
       }
       
