@@ -149,7 +149,8 @@ const updateProfile = async () => {
   errorMsg.value = ''
 
   try {
-    const { error } = await supabase.auth.updateUser({
+    // Update user metadata
+    const { error: authError } = await supabase.auth.updateUser({
       data: {
         full_name: `${firstName.value.trim()} ${lastName.value.trim()}`,
         first_name: firstName.value.trim(),
@@ -158,11 +159,14 @@ const updateProfile = async () => {
       },
     })
 
-    if (error) {
-      errorMsg.value = error.message
-    } else {
-      router.push({ name: 'Home' })
+    if (authError) {
+      errorMsg.value = authError.message
+      return
     }
+
+    // User data is already stored in auth.users.raw_user_meta_data by updateUser above
+
+    router.push({ name: 'Home' })
   } catch {
     errorMsg.value = 'An unexpected error occurred. Please try again.'
   } finally {

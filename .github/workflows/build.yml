@@ -1,0 +1,79 @@
+name: Build and Release ReelRoom Extension
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+  release:
+    types: [ created ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+        
+    - name: Install dependencies
+      run: npm ci
+      
+    - name: Run linter
+      run: npm run lint
+      
+    - name: Build extension with secrets
+      env:
+        OAUTH2_CLIENT_ID: ${{ secrets.OAUTH2_CLIENT_ID }}
+        SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+        SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+      run: npm run build:prod
+      
+    - name: Copy additional files to dist
+      run: |
+        cp public/content-script.js dist/
+        cp public/manifest.json dist/
+      
+    - name: Create extension package
+      run: |
+        cd dist
+        zip -r ../reelroom-extension-${{ github.sha }}.zip .
+        cd ..
+        
+    - name: Upload build artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: reelroom-extension-${{ github.sha }}
+        path: reelroom-extension-${{ github.sha }}.zip
+        retention-days: 30
+        
+    - name: Restore original files
+      run: |
+        git checkout public/manifest.json src/supabase.js
+      
+  release:
+    if: github.event_name == 'release'
+    needs: build
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Download build artifact
+      uses: actions/download-artifact@v4
+      with:
+        name: reelroom-extension-${{ github.sha }}
+        
+    - name: Upload to GitHub Release
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ github.event.release.upload_url }}
+        asset_path: ./reelroom-extension-${{ github.sha }}.zip
+        asset_name: reelroom-extension.zip
+        asset_content_type: application/zip

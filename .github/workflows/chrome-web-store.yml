@@ -1,0 +1,51 @@
+name: Publish to Chrome Web Store
+
+on:
+  release:
+    types: [ published ]
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+        
+    - name: Install dependencies
+      run: npm ci
+      
+    - name: Build extension with secrets
+      env:
+        OAUTH2_CLIENT_ID: ${{ secrets.OAUTH2_CLIENT_ID }}
+        SUPABASE_CLIENT_ID: ${{ secrets.SUPABASE_CLIENT_ID }}
+        SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+        SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+      run: npm run build:prod
+      
+    - name: Copy content script and manifest
+      run: |
+        cp public/content-script.js dist/
+        cp public/manifest.json dist/
+        
+    - name: Create extension zip
+      run: |
+        cd dist
+        zip -r ../extension.zip .
+        cd ..
+        
+    - name: Publish to Chrome Web Store
+      uses: mnao305/chrome-extension-upload@v5.0.0
+      with:
+        file-path: extension.zip
+        extension-id: ${{ secrets.CHROME_EXTENSION_ID }}
+        client-id: ${{ secrets.CHROME_CLIENT_ID }}
+        client-secret: ${{ secrets.CHROME_CLIENT_SECRET }}
+        refresh-token: ${{ secrets.CHROME_REFRESH_TOKEN }}
+        publish: true
