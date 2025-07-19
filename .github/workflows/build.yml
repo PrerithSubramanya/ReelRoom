@@ -11,6 +11,7 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    environment: prod
     
     steps:
     - name: Checkout code
@@ -74,6 +75,7 @@ jobs:
     if: github.event_name == 'release'
     needs: build
     runs-on: ubuntu-latest
+    environment: prod
     
     steps:
     - name: Download build artifact
