@@ -28,6 +28,20 @@ jobs:
     - name: Run linter
       run: npm run lint
       
+    - name: Debug environment variables
+      env:
+        OAUTH2_CLIENT_ID: ${{ secrets.OAUTH2_CLIENT_ID }}
+        SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+        SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+      run: |
+        echo "🔍 Debug: Environment variables check"
+        echo "OAUTH2_CLIENT_ID is set: $([[ -n \"$OAUTH2_CLIENT_ID\" ]] && echo 'YES' || echo 'NO')"
+        echo "OAUTH2_CLIENT_ID starts with: ${OAUTH2_CLIENT_ID:0:20}..."
+        echo "SUPABASE_URL is set: $([[ -n \"$SUPABASE_URL\" ]] && echo 'YES' || echo 'NO')"
+        echo "SUPABASE_URL starts with: ${SUPABASE_URL:0:20}..."
+        echo "SUPABASE_ANON_KEY is set: $([[ -n \"$SUPABASE_ANON_KEY\" ]] && echo 'YES' || echo 'NO')"
+        echo "SUPABASE_ANON_KEY starts with: ${SUPABASE_ANON_KEY:0:20}..."
+      
     - name: Build extension with secrets
       env:
         OAUTH2_CLIENT_ID: ${{ secrets.OAUTH2_CLIENT_ID }}
