@@ -24,7 +24,6 @@ jobs:
     - name: Build extension with secrets
       env:
         OAUTH2_CLIENT_ID: ${{ secrets.OAUTH2_CLIENT_ID }}
-        SUPABASE_CLIENT_ID: ${{ secrets.SUPABASE_CLIENT_ID }}
         SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
         SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
       run: npm run build:prod
