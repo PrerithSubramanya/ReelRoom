@@ -9,7 +9,6 @@ const __dirname = path.dirname(__filename);
 
 // Read environment variables
 const OAUTH2_CLIENT_ID = process.env.OAUTH2_CLIENT_ID || '{{OAUTH2_CLIENT_ID}}';
-const SUPABASE_CLIENT_ID = process.env.SUPABASE_CLIENT_ID || '{{SUPABASE_CLIENT_ID}}';
 const SUPABASE_URL = process.env.SUPABASE_URL || '{{SUPABASE_URL}}';
 const SUPABASE_ANON_KEY = process.env.SUPABASE_ANON_KEY || '{{SUPABASE_ANON_KEY}}';
 
@@ -22,7 +21,6 @@ if (fs.existsSync(manifestPath)) {
 
   // Replace placeholders with actual values
   manifestContent = manifestContent.replace(/\{\{OAUTH2_CLIENT_ID\}\}/g, OAUTH2_CLIENT_ID);
-  manifestContent = manifestContent.replace(/\{\{SUPABASE_CLIENT_ID\}\}/g, SUPABASE_CLIENT_ID);
 
   // Write the updated manifest
   fs.writeFileSync(manifestPath, manifestContent);
