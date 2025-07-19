@@ -38,7 +38,6 @@ jobs:
     - name: Copy additional files to dist
       run: |
         cp public/content-script.js dist/
-        cp public/manifest.json dist/
       
     - name: Create extension package
       run: |
