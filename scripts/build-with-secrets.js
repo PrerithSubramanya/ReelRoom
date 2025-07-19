@@ -15,6 +15,7 @@ const SUPABASE_ANON_KEY = process.env.SUPABASE_ANON_KEY || '{{SUPABASE_ANON_KEY}
 console.log('🔧 Injecting secrets into built extension...');
 console.log('📊 Environment check:');
 console.log('- OAUTH2_CLIENT_ID:', OAUTH2_CLIENT_ID ? 'SET' : 'NOT SET');
+console.log('- OAUTH2_CLIENT_ID value starts with:', OAUTH2_CLIENT_ID.substring(0, 20) + '...');
 console.log('- SUPABASE_URL:', SUPABASE_URL ? 'SET' : 'NOT SET');
 console.log('- SUPABASE_ANON_KEY:', SUPABASE_ANON_KEY ? 'SET' : 'NOT SET');
 
