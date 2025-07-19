@@ -11,36 +11,51 @@ const __dirname = path.dirname(__filename);
 const OAUTH2_CLIENT_ID = process.env.OAUTH2_CLIENT_ID || '{{OAUTH2_CLIENT_ID}}';
 const SUPABASE_CLIENT_ID = process.env.SUPABASE_CLIENT_ID || '{{SUPABASE_CLIENT_ID}}';
 
-console.log('🔧 Building ReelRoom with environment secrets...');
+console.log('🔧 Injecting secrets into built extension...');
 
-// Read manifest template
-const manifestPath = path.join(__dirname, '../public/manifest.json');
-let manifestContent = fs.readFileSync(manifestPath, 'utf8');
+// Update manifest in dist directory
+const manifestPath = path.join(__dirname, '../dist/manifest.json');
+if (fs.existsSync(manifestPath)) {
+  let manifestContent = fs.readFileSync(manifestPath, 'utf8');
 
-// Replace placeholders with actual values
-manifestContent = manifestContent.replace(/\{\{OAUTH2_CLIENT_ID\}\}/g, OAUTH2_CLIENT_ID);
-manifestContent = manifestContent.replace(/\{\{SUPABASE_CLIENT_ID\}\}/g, SUPABASE_CLIENT_ID);
+  // Replace placeholders with actual values
+  manifestContent = manifestContent.replace(/\{\{OAUTH2_CLIENT_ID\}\}/g, OAUTH2_CLIENT_ID);
+  manifestContent = manifestContent.replace(/\{\{SUPABASE_CLIENT_ID\}\}/g, SUPABASE_CLIENT_ID);
 
-// Write the updated manifest
-fs.writeFileSync(manifestPath, manifestContent);
+  // Write the updated manifest
+  fs.writeFileSync(manifestPath, manifestContent);
+  console.log('✅ Manifest updated with secrets');
+} else {
+  console.error('❌ dist/manifest.json not found. Run build first.');
+  process.exit(1);
+}
 
-console.log('✅ Manifest updated with secrets');
-
-// Also update supabase.js if it contains placeholders
-const supabasePath = path.join(__dirname, '../src/supabase.js');
-if (fs.existsSync(supabasePath)) {
-  let supabaseContent = fs.readFileSync(supabasePath, 'utf8');
+// Update any built JS files that contain placeholders
+const distAssetsPath = path.join(__dirname, '../dist/assets');
+if (fs.existsSync(distAssetsPath)) {
+  const files = fs.readdirSync(distAssetsPath);
   
-  // Replace any placeholders in supabase.js
-  if (process.env.SUPABASE_URL) {
-    supabaseContent = supabaseContent.replace(/\{\{SUPABASE_URL\}\}/g, process.env.SUPABASE_URL);
+  for (const file of files) {
+    if (file.endsWith('.js')) {
+      const filePath = path.join(distAssetsPath, file);
+      let content = fs.readFileSync(filePath, 'utf8');
+      
+      let updated = false;
+      if (process.env.SUPABASE_URL && content.includes('{{SUPABASE_URL}}')) {
+        content = content.replace(/\{\{SUPABASE_URL\}\}/g, process.env.SUPABASE_URL);
+        updated = true;
+      }
+      if (process.env.SUPABASE_ANON_KEY && content.includes('{{SUPABASE_ANON_KEY}}')) {
+        content = content.replace(/\{\{SUPABASE_ANON_KEY\}\}/g, process.env.SUPABASE_ANON_KEY);
+        updated = true;
+      }
+      
+      if (updated) {
+        fs.writeFileSync(filePath, content);
+        console.log(`✅ Updated secrets in ${file}`);
+      }
+    }
   }
-  if (process.env.SUPABASE_ANON_KEY) {
-    supabaseContent = supabaseContent.replace(/\{\{SUPABASE_ANON_KEY\}\}/g, process.env.SUPABASE_ANON_KEY);
-  }
-  
-  fs.writeFileSync(supabasePath, supabaseContent);
-  console.log('✅ Supabase config updated with secrets');
 }
 
 console.log('🚀 Ready for build!');

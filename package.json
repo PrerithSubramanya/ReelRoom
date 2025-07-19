@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "build:prod": "node scripts/build-with-secrets.js && npm run build",
+    "build:prod": "npm run build && node scripts/build-with-secrets.js",
     "preview": "vite preview",
     "lint": "eslint . --fix",
     "format": "prettier --write src/"
