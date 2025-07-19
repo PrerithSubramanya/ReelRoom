@@ -53,10 +53,20 @@ function broadcastVideoEvent(eventType) {
 // Handle remote video events
 function handleRemoteVideoEvent(eventData) {
   if (!videoElement || isProcessingRemoteEvent) {
+    console.log('ReelRoom: Skipping remote event - no video or processing', {
+      hasVideo: !!videoElement,
+      isProcessing: isProcessingRemoteEvent
+    });
     return;
   }
 
   console.log('ReelRoom: Handling remote event:', eventData);
+  console.log('ReelRoom: Current video state:', {
+    paused: videoElement.paused,
+    currentTime: videoElement.currentTime,
+    readyState: videoElement.readyState
+  });
+  
   isProcessingRemoteEvent = true;
 
   try {
@@ -64,27 +74,45 @@ function handleRemoteVideoEvent(eventData) {
     
     switch (eventData.event_type) {
       case 'play':
-        console.log('ReelRoom: Syncing play event');
+        console.log('ReelRoom: Syncing play event, time diff:', timeDiff);
         if (videoElement.paused) {
           if (timeDiff > 1) {
+            console.log('ReelRoom: Syncing time before play');
             videoElement.currentTime = eventData.video_time;
           }
-          videoElement.play();
+          videoElement.play().then(() => {
+            console.log('ReelRoom: Play successful');
+          }).catch(error => {
+            console.error('ReelRoom: Play failed:', error);
+            // Try again after a short delay
+            setTimeout(() => {
+              videoElement.play().catch(e => 
+                console.error('ReelRoom: Play retry failed:', e)
+              );
+            }, 100);
+          });
+        } else {
+          console.log('ReelRoom: Video already playing');
         }
         break;
       case 'pause':
-        console.log('ReelRoom: Syncing pause event');
+        console.log('ReelRoom: Syncing pause event, time diff:', timeDiff);
         if (!videoElement.paused) {
           videoElement.pause();
           if (timeDiff > 1) {
+            console.log('ReelRoom: Syncing time after pause');
             videoElement.currentTime = eventData.video_time;
           }
+          console.log('ReelRoom: Pause successful');
+        } else {
+          console.log('ReelRoom: Video already paused');
         }
         break;
       case 'seeked':
-        console.log('ReelRoom: Syncing seek event');
+        console.log('ReelRoom: Syncing seek event, time diff:', timeDiff);
         if (timeDiff > 1) {
           videoElement.currentTime = eventData.video_time;
+          console.log('ReelRoom: Seek successful');
         }
         break;
     }
@@ -93,14 +121,25 @@ function handleRemoteVideoEvent(eventData) {
   } finally {
     setTimeout(() => {
       isProcessingRemoteEvent = false;
+      console.log('ReelRoom: Remote event processing finished');
     }, 500);
   }
 }
 
 // Setup video monitoring
 function setupVideoMonitoring(video) {
+  // Remove existing listeners if video element changes
+  if (videoElement && videoElement !== video) {
+    console.log('ReelRoom: Switching to new video element');
+  }
+  
   videoElement = video;
-  console.log('ReelRoom: Video element found!', video);
+  console.log('ReelRoom: Video element found!', {
+    paused: video.paused,
+    currentTime: video.currentTime,
+    readyState: video.readyState,
+    src: video.src || video.currentSrc
+  });
   
   video.addEventListener('play', () => {
     console.log('ReelRoom: Video is playing');
@@ -129,28 +168,88 @@ chrome.runtime.onMessage.addListener((message) => {
   }
 });
 
+// Find the best video element (largest, not muted, not hidden)
+function findMainVideoElement() {
+  const videos = document.querySelectorAll('video');
+  console.log(`ReelRoom: Found ${videos.length} video elements`);
+  
+  if (videos.length === 0) return null;
+  if (videos.length === 1) return videos[0];
+  
+  // Find the main video (largest, not muted, likely the main content)
+  let bestVideo = null;
+  let bestScore = -1;
+  
+  videos.forEach((video, index) => {
+    const rect = video.getBoundingClientRect();
+    const area = rect.width * rect.height;
+    const isVisible = rect.width > 0 && rect.height > 0 && !video.hidden;
+    const isMain = !video.muted && video.duration > 30; // Likely main content
+    
+    let score = area;
+    if (isMain) score += 1000000; // Heavily favor non-muted, longer videos
+    if (isVisible) score += 100000;
+    
+    console.log(`ReelRoom: Video ${index}:`, {
+      area,
+      isVisible,
+      isMain,
+      muted: video.muted,
+      duration: video.duration,
+      score,
+      src: video.src || video.currentSrc
+    });
+    
+    if (score > bestScore) {
+      bestScore = score;
+      bestVideo = video;
+    }
+  });
+  
+  return bestVideo;
+}
+
+// Continuously monitor for video element changes
+function startVideoMonitoring() {
+  const checkInterval = setInterval(() => {
+    if (!roomId) return; // Don't monitor if not in a room
+    
+    const currentVideo = findMainVideoElement();
+    
+    if (currentVideo && currentVideo !== videoElement) {
+      console.log('ReelRoom: New video element detected, setting up monitoring');
+      setupVideoMonitoring(currentVideo);
+    } else if (!currentVideo && videoElement) {
+      console.log('ReelRoom: Video element lost');
+      videoElement = null;
+    }
+  }, 2000); // Check every 2 seconds
+  
+  // Clear interval when leaving page
+  window.addEventListener('beforeunload', () => {
+    clearInterval(checkInterval);
+  });
+}
+
 // Initialize
 async function init() {
   await getRoomInfo();
   
-  // Look for video element
-  const video = document.querySelector('video');
+  if (!roomId) {
+    console.log('ReelRoom: Not in a room, skipping video monitoring');
+    return;
+  }
+  
+  // Look for video element immediately
+  const video = findMainVideoElement();
   if (video) {
     setupVideoMonitoring(video);
   } else {
-    console.error('ReelRoom: Could not find a video element on the page');
-    
-    // Try again after a delay
-    setTimeout(() => {
-      const delayedVideo = document.querySelector('video');
-      if (delayedVideo) {
-        console.log('ReelRoom: Video element found after delay!');
-        setupVideoMonitoring(delayedVideo);
-      } else {
-        console.error('ReelRoom: Still no video element found after delay');
-      }
-    }, 3000);
+    console.log('ReelRoom: No video element found initially, will keep checking');
   }
+  
+  // Start continuous monitoring for video changes
+  startVideoMonitoring();
 }
 
 init();
